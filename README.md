@@ -15,13 +15,13 @@ Backup and restore your [Hermes Agent](https://hermes-agent.nousresearch.com) en
 ### One-liner
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/waynehuang/hermes-pack/main/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/wayne45/hermes-pack/main/install.sh)
 ```
 
 ### Manual
 
 ```bash
-git clone https://github.com/waynehuang/hermes-pack.git ~/hermes-pack
+git clone https://github.com/wayne45/hermes-pack.git ~/hermes-pack
 chmod +x ~/hermes-pack/hermes-pack.sh
 ```
 

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # hermes-pack installer
-# Usage: bash <(curl -sL https://raw.githubusercontent.com/waynehuang/hermes-pack/main/install.sh)
+# Usage: bash <(curl -sL https://raw.githubusercontent.com/wayne45/hermes-pack/main/install.sh)
 
 INSTALL_DIR="$HOME/hermes-pack"
 
@@ -17,7 +17,7 @@ else
         echo "Directory exists but is not a git repo. Removing and re-cloning..."
         rm -rf "$INSTALL_DIR"
     fi
-    git clone https://github.com/waynehuang/hermes-pack.git "$INSTALL_DIR"
+    git clone https://github.com/wayne45/hermes-pack.git "$INSTALL_DIR"
 fi
 
 chmod +x "$INSTALL_DIR/hermes-pack.sh"
