@@ -87,8 +87,10 @@ On first run, hermes-pack asks for your private git repo URL (e.g. `git@github.c
 1. **Push**: rsync `~/.hermes/` → `~/.hermes/.hermes-pack-repo` (local git working tree) → commit → push to your private repo
 2. **Pull**: clone/fetch from private repo → rsync back to `~/.hermes/` → manual secret setup
 
+**SSH fallback to gh CLI**: If SSH push/fetch fails and `gh` is installed and authenticated (`gh auth login`), hermes-pack automatically switches to HTTPS. This is saved to config (`PACK_USE_GH=true`) so subsequent operations use HTTPS directly without retrying SSH. You always provide an SSH-style URL — the conversion is handled internally.
+
 Key paths:
-- **`~/.hermes/.hermes-pack.conf`** — stores your private repo URL (created on first run)
+- **`~/.hermes/.hermes-pack.conf`** — stores your private repo URL, git email, and transport preference (created on first run)
 - **`~/.hermes/.hermes-pack-repo/`** — local git staging area for push/pull operations
 
 Excluded from backup (edit these files to customize):
@@ -100,6 +102,7 @@ Excluded from backup (edit these files to customize):
 - Git
 - Bash 4+
 - rsync
+- `gh` CLI (optional — used as HTTPS fallback when SSH fails)
 - Python 3.10+ and `uv` (for MCP server only)
 
 ## License

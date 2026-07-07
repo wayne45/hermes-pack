@@ -38,7 +38,100 @@ save_config() {
     cat > "$PACK_CONF" <<EOF
 PACK_REMOTE_URL="$PACK_REMOTE_URL"
 PACK_GIT_EMAIL="${PACK_GIT_EMAIL:-}"
+PACK_USE_GH="${PACK_USE_GH:-}"
 EOF
+}
+
+# Convert git@github.com:user/repo.git to HTTPS URL for gh
+ssh_to_https_url() {
+    local url="$1"
+    echo "$url" | sed -E 's|^git@github\.com:|https://github.com/|; s|\.git$||'
+}
+
+# Git push with fallback to gh
+git_push_with_fallback() {
+    local branch="$1"
+    shift
+    local extra_args=("$@")
+
+    if [[ "${PACK_USE_GH:-}" == "true" ]]; then
+        gh repo sync --source . 2>/dev/null || git push -u origin "$branch" "${extra_args[@]}" 2>&1 | sed 's/^/  /'
+        return
+    fi
+
+    if git push -u origin "$branch" "${extra_args[@]}" 2>&1 | sed 's/^/  /'; then
+        return 0
+    fi
+
+    # SSH failed, try gh
+    if command -v gh &>/dev/null && gh auth status &>/dev/null; then
+        warn "SSH push failed, falling back to gh CLI..."
+        local https_url
+        https_url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+        git remote set-url origin "$https_url"
+        if git push -u origin "$branch" "${extra_args[@]}" 2>&1 | sed 's/^/  /'; then
+            PACK_USE_GH="true"
+            save_config
+            ok "Switched to HTTPS via gh (saved for future pushes)"
+            return 0
+        fi
+        # Restore SSH URL
+        git remote set-url origin "$PACK_REMOTE_URL"
+        return 1
+    else
+        error "Push failed. Install and authenticate gh CLI for HTTPS fallback: gh auth login"
+        return 1
+    fi
+}
+
+# Git fetch/clone with fallback to gh
+git_fetch_with_fallback() {
+    local action="$1"
+
+    if [[ "${PACK_USE_GH:-}" == "true" ]]; then
+        local https_url
+        https_url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+        git remote set-url origin "$https_url" 2>/dev/null || true
+    fi
+
+    if [[ "$action" == "clone" ]]; then
+        local url="$PACK_REMOTE_URL"
+        [[ "${PACK_USE_GH:-}" == "true" ]] && url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+        if git clone -q "$url" "$PACK_REPO" 2>/dev/null; then
+            return 0
+        fi
+        # Try gh fallback
+        if command -v gh &>/dev/null && gh auth status &>/dev/null; then
+            warn "SSH clone failed, falling back to gh CLI..."
+            local https_url
+            https_url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+            if git clone -q "$https_url" "$PACK_REPO" 2>/dev/null; then
+                PACK_USE_GH="true"
+                save_config
+                ok "Switched to HTTPS via gh (saved for future operations)"
+                return 0
+            fi
+        fi
+        return 1
+    elif [[ "$action" == "fetch" ]]; then
+        if git fetch origin --tags 2>/dev/null; then
+            return 0
+        fi
+        if command -v gh &>/dev/null && gh auth status &>/dev/null; then
+            warn "SSH fetch failed, falling back to gh CLI..."
+            local https_url
+            https_url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+            git remote set-url origin "$https_url"
+            if git fetch origin --tags 2>/dev/null; then
+                PACK_USE_GH="true"
+                save_config
+                ok "Switched to HTTPS via gh (saved for future operations)"
+                return 0
+            fi
+            git remote set-url origin "$PACK_REMOTE_URL"
+        fi
+        return 1
+    fi
 }
 
 # Ask for repo URL if not configured
@@ -98,10 +191,11 @@ init_pack_repo() {
         mkdir -p "$PACK_REPO"
         cd "$PACK_REPO"
         git init -q
-        git remote add origin "$PACK_REMOTE_URL" 2>/dev/null || git remote set-url origin "$PACK_REMOTE_URL"
+        local url="$PACK_REMOTE_URL"
+        [[ "${PACK_USE_GH:-}" == "true" ]] && url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+        git remote add origin "$url" 2>/dev/null || git remote set-url origin "$url"
         # Try to pull existing content
-        if git ls-remote origin &>/dev/null; then
-            git fetch origin 2>/dev/null || true
+        if git_fetch_with_fallback fetch; then
             if git rev-parse origin/main &>/dev/null; then
                 git checkout -b main origin/main 2>/dev/null || true
             else
@@ -113,7 +207,9 @@ init_pack_repo() {
         ok "Pack repo initialized"
     else
         cd "$PACK_REPO"
-        git remote set-url origin "$PACK_REMOTE_URL"
+        local url="$PACK_REMOTE_URL"
+        [[ "${PACK_USE_GH:-}" == "true" ]] && url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+        git remote set-url origin "$url"
     fi
 
     # Apply git email if configured
@@ -213,7 +309,7 @@ cmd_push() {
 
     # Push
     info "Pushing to remote..."
-    git push -u origin "$branch" --tags 2>&1 | sed 's/^/  /'
+    git_push_with_fallback "$branch" --tags
 
     echo ""
     ok "Push complete!"
@@ -261,11 +357,13 @@ cmd_pull() {
     # Clone or fetch
     if [[ -d "$PACK_REPO/.git" ]]; then
         cd "$PACK_REPO"
-        git remote set-url origin "$PACK_REMOTE_URL"
-        git fetch origin --tags
+        local url="$PACK_REMOTE_URL"
+        [[ "${PACK_USE_GH:-}" == "true" ]] && url=$(ssh_to_https_url "$PACK_REMOTE_URL")
+        git remote set-url origin "$url"
+        git_fetch_with_fallback fetch || die "Failed to fetch from remote."
     else
         rm -rf "$PACK_REPO"
-        git clone -q "$PACK_REMOTE_URL" "$PACK_REPO"
+        git_fetch_with_fallback clone || die "Failed to clone from remote."
         cd "$PACK_REPO"
     fi
 
@@ -361,7 +459,7 @@ cmd_delete_tag() {
 
     # Delete remote tag
     if git ls-remote --tags origin | grep -q "refs/tags/$tag"; then
-        git push origin --delete "$tag" 2>&1 | sed 's/^/  /'
+        git_push_with_fallback main --delete "$tag"
         ok "Deleted remote tag: $tag"
     else
         warn "Remote tag '$tag' not found."
