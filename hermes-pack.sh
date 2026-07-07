@@ -33,9 +33,12 @@ load_config() {
     fi
 }
 
-# Save repo URL
+# Save config
 save_config() {
-    echo "PACK_REMOTE_URL=\"$PACK_REMOTE_URL\"" > "$PACK_CONF"
+    cat > "$PACK_CONF" <<EOF
+PACK_REMOTE_URL="$PACK_REMOTE_URL"
+PACK_GIT_EMAIL="${PACK_GIT_EMAIL:-}"
+EOF
 }
 
 # Ask for repo URL if not configured
@@ -48,8 +51,9 @@ ensure_repo_url() {
         echo ""
         read -rp "Repo URL (e.g. git@github.com:user/hermes-backup.git): " PACK_REMOTE_URL
         [[ -z "$PACK_REMOTE_URL" ]] && die "Repo URL is required."
+        read -rp "Git email for commits (leave empty to use global): " PACK_GIT_EMAIL
         save_config
-        ok "Saved repo URL to $PACK_CONF"
+        ok "Saved config to $PACK_CONF"
     fi
 }
 
@@ -110,6 +114,11 @@ init_pack_repo() {
     else
         cd "$PACK_REPO"
         git remote set-url origin "$PACK_REMOTE_URL"
+    fi
+
+    # Apply git email if configured
+    if [[ -n "${PACK_GIT_EMAIL:-}" ]]; then
+        git config user.email "$PACK_GIT_EMAIL"
     fi
 }
 
