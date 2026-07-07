@@ -35,6 +35,7 @@ chmod +x ~/hermes-pack/hermes-pack.sh
 ~/hermes-pack/hermes-pack.sh push --tag "before-upgrade" --message "full backup"
 
 # Restore — --version accepts a tag or commit hash
+# Note: pull only adds/overwrites files from the backup, it won't delete extra local skills or files
 ~/hermes-pack/hermes-pack.sh pull <repo-url> [--version <tag/hash>]
 
 # First time or new machine (provide repo URL)
