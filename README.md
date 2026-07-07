@@ -71,8 +71,14 @@ hermes-pack/
 
 ## How It Works
 
-1. **Push**: rsync `~/.hermes/` → local git working tree → commit → push to your private repo
+On first run, hermes-pack asks for your private git repo URL (e.g. `git@github.com:user/hermes-backup.git`) and saves it to `~/.hermes/.hermes-pack.conf`. It then creates a local git working tree at `~/.hermes/.hermes-pack-repo` which serves as the staging area for uploads.
+
+1. **Push**: rsync `~/.hermes/` → `~/.hermes/.hermes-pack-repo` (local git working tree) → commit → push to your private repo
 2. **Pull**: clone/fetch from private repo → rsync back to `~/.hermes/` → manual secret setup
+
+Key paths:
+- **`~/.hermes/.hermes-pack.conf`** — stores your private repo URL (created on first run)
+- **`~/.hermes/.hermes-pack-repo/`** — local git staging area for push/pull operations
 
 Excluded from backup (edit these files to customize):
 - **`exclude-patterns.txt`** — file/directory patterns (caches, logs, secrets, temp files)
