@@ -11,6 +11,7 @@ echo "Installing hermes-pack to $INSTALL_DIR ..."
 if [[ -d "$INSTALL_DIR/.git" ]]; then
     echo "Already installed. Updating..."
     cd "$INSTALL_DIR"
+    git remote set-url origin https://github.com/wayne45/hermes-pack.git
     git pull origin main
 else
     if [[ -d "$INSTALL_DIR" ]]; then
