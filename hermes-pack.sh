@@ -151,12 +151,14 @@ EOF
 cmd_push() {
     local message=""
     local tag=""
+    local branch="main"
 
     # Parse args
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --message)     message="$2"; shift 2 ;;
             --tag)         tag="$2"; shift 2 ;;
+            --branch)      branch="$2"; shift 2 ;;
             *)             die "Unknown option: $1" ;;
         esac
     done
@@ -184,6 +186,9 @@ cmd_push() {
     # Git add and commit
     cd "$PACK_REPO"
 
+    # Switch to target branch
+    git checkout "$branch" 2>/dev/null || git checkout -b "$branch"
+
     # Generate manifest
     generate_manifest
     git add -A
@@ -208,7 +213,7 @@ cmd_push() {
 
     # Push
     info "Pushing to remote..."
-    git push -u origin main --tags 2>&1 | sed 's/^/  /'
+    git push -u origin "$branch" --tags 2>&1 | sed 's/^/  /'
 
     echo ""
     ok "Push complete!"
@@ -398,7 +403,7 @@ usage() {
     echo "hermes-pack — Pack and restore Hermes agent environment"
     echo ""
     echo "Usage:"
-    echo "  hermes-pack push [--message \"msg\"] [--tag <name>]"
+    echo "  hermes-pack push [--message \"msg\"] [--tag <name>] [--branch <name>]"
     echo "  hermes-pack pull <repo-url> [--version <tag/hash>]"
     echo "  hermes-pack delete-tag <name>"
     echo "  hermes-pack update"
