@@ -34,13 +34,16 @@ chmod +x ~/hermes-pack/hermes-pack.sh
 ~/hermes-pack/hermes-pack.sh push
 ~/hermes-pack/hermes-pack.sh push --tag "before-upgrade" --message "full backup"
 
-# Restore (first time or new machine — provide repo URL)
+# Restore — --version accepts a tag or commit hash
+~/hermes-pack/hermes-pack.sh pull <repo-url> [--version <tag/hash>]
+
+# First time or new machine (provide repo URL)
 ~/hermes-pack/hermes-pack.sh pull git@github.com:user/hermes-backup.git
 ~/hermes-pack/hermes-pack.sh pull git@github.com:user/hermes-backup.git --version v2
 
-# Restore (subsequent times — repo URL is saved in ~/.hermes/.hermes-pack.conf)
+# Subsequent times (repo URL is saved in ~/.hermes/.hermes-pack.conf)
 ~/hermes-pack/hermes-pack.sh pull
-~/hermes-pack/hermes-pack.sh pull --version v2
+~/hermes-pack/hermes-pack.sh pull --version 5da3361
 
 # Manage
 ~/hermes-pack/hermes-pack.sh delete-tag old-tag
