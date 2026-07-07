@@ -365,6 +365,24 @@ cmd_update() {
 }
 
 # ============================================================
+# CLEAN
+# ============================================================
+cmd_clean() {
+    warn "This will remove all hermes-pack local data:"
+    echo "  - $PACK_REPO"
+    echo "  - $PACK_CONF"
+    echo "  - $HERMES_HOME/.hermes-pack-backup"
+    echo ""
+    read -rp "Continue? [y/N] " confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] || { info "Cancelled."; return 0; }
+
+    rm -rf "$PACK_REPO"
+    rm -f "$PACK_CONF"
+    rm -rf "$HERMES_HOME/.hermes-pack-backup"
+    ok "Cleaned. You can now run 'hermes-pack push' or 'hermes-pack pull' with a new repo."
+}
+
+# ============================================================
 # MAIN
 # ============================================================
 usage() {
@@ -375,19 +393,20 @@ usage() {
     echo "  hermes-pack pull <repo-url> [--version <tag/hash>]"
     echo "  hermes-pack delete-tag <name>"
     echo "  hermes-pack update"
+    echo "  hermes-pack clean"
     echo ""
     echo "Examples:"
     echo "  hermes-pack push --tag \"before-upgrade\" --message \"full backup\""
     echo "  hermes-pack pull git@github.com:user/hermes-backup.git"
-    echo "  hermes-pack pull git@github.com:user/hermes-backup.git --version v2"
+    echo "  hermes-pack pull --version v2"
     echo "  hermes-pack delete-tag test-v1"
-    echo "  hermes-pack update"
 }
 
 case "${1:-}" in
     push)       shift; cmd_push "$@" ;;
     pull)       shift; cmd_pull "$@" ;;
     delete-tag) shift; cmd_delete_tag "$@" ;;
+    clean)      shift; cmd_clean ;;
     update)     shift; cmd_update ;;
     -h|--help|help|"") usage ;;
     *)     die "Unknown command: $1. Use 'hermes-pack --help'" ;;

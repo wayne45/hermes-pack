@@ -49,6 +49,9 @@ chmod +x ~/hermes-pack/hermes-pack.sh
 # Manage
 ~/hermes-pack/hermes-pack.sh delete-tag old-tag
 ~/hermes-pack/hermes-pack.sh update
+
+# Clean (reset local pack data to switch to a different repo)
+~/hermes-pack/hermes-pack.sh clean
 ```
 
 ## MCP Server
