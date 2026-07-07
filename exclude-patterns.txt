@@ -37,6 +37,7 @@ auth.json
 
 # hermes-pack internal
 .hermes-pack-repo/
+.hermes-pack-backup/
 .hermes-pack.conf
 
 # History

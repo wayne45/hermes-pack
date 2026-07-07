@@ -273,7 +273,8 @@ cmd_pull() {
     fi
 
     # Backup current hermes home (critical files only)
-    local backup_dir="$HERMES_HOME/.pre-pull-backup-$(date +%Y%m%d_%H%M%S)"
+    local backup_dir="$HERMES_HOME/.hermes-pack-backup"
+    rm -rf "$backup_dir"
     mkdir -p "$backup_dir"
     for f in config.yaml SOUL.md; do
         [[ -f "$HERMES_HOME/$f" ]] && cp "$HERMES_HOME/$f" "$backup_dir/"
