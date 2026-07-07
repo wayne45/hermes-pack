@@ -1,0 +1,60 @@
+# Exclude patterns — files/dirs excluded from hermes-pack push
+# These are rsync-style patterns relative to ~/.hermes/
+# One pattern per line. Comments start with #.
+
+# Hermes runtime (reinstalled by `hermes update`)
+hermes-agent/
+bin/
+
+# Caches
+cache/
+audio_cache/
+image_cache/
+
+# Logs and sessions
+logs/
+sandboxes/
+sessions/
+pastes/
+
+# Database temp files
+*.db-shm
+*.db-wal
+
+# Lock and backup files
+*.lock
+*.bak.*
+
+# Python cache
+__pycache__/
+
+# OS files
+.DS_Store
+
+# Secrets and auth (never push these)
+.env
+auth.json
+
+# hermes-pack internal
+.hermes-pack-repo/
+.hermes-pack.conf
+
+# History
+.hermes_history
+
+# Skills hub cache
+skills/.hub/
+skills/.usage.json
+skills/.curator_state
+skills/.bundled_manifest
+
+# Misc temp/cache files
+interrupt_debug.log
+models_dev_cache.json
+ollama_cloud_models_cache.json
+.skills_prompt_snapshot.json
+.update_check
+
+# Session state (large and not portable)
+state.db
+state.db.gz

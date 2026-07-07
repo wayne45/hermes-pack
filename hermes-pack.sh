@@ -10,7 +10,8 @@ HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
 HERMES_PACK_HOME="$(cd "$(dirname "$0")" && pwd)"
 PACK_CONF="$HERMES_HOME/.hermes-pack.conf"
 PACK_REPO="$HERMES_HOME/.hermes-pack-repo"
-BUNDLED_SKILLS="$HERMES_PACK_HOME/bundled-skills.txt"
+EXCLUDE_SKILLS="$HERMES_PACK_HOME/exclude-skills.txt"
+EXCLUDE_PATTERNS="$HERMES_PACK_HOME/exclude-patterns.txt"
 
 # Colors
 RED='\033[0;31m'
@@ -57,45 +58,19 @@ build_exclude_list() {
     local exclude_file
     exclude_file=$(mktemp)
 
-    # Static excludes
-    cat >> "$exclude_file" <<'EOF'
-hermes-agent/
-bin/
-cache/
-audio_cache/
-image_cache/
-logs/
-sandboxes/
-sessions/
-pastes/
-*.db-shm
-*.db-wal
-*.lock
-*.bak.*
-__pycache__/
-.DS_Store
-.env
-auth.json
-.hermes-pack-repo/
-.hermes-pack.conf
-.hermes_history
-skills/.hub/
-skills/.usage.json
-skills/.curator_state
-skills/.bundled_manifest
-interrupt_debug.log
-models_dev_cache.json
-ollama_cloud_models_cache.json
-.skills_prompt_snapshot.json
-.update_check
-EOF
-
-    # Always exclude state.db (session history is large and not portable)
-    echo "state.db" >> "$exclude_file"
-    echo "state.db.gz" >> "$exclude_file"
+    # Load patterns from external file
+    if [[ -f "$EXCLUDE_PATTERNS" ]]; then
+        while IFS= read -r line; do
+            [[ "$line" =~ ^#.*$ ]] && continue
+            [[ -z "$line" ]] && continue
+            echo "$line" >> "$exclude_file"
+        done < "$EXCLUDE_PATTERNS"
+    else
+        die "Exclude patterns file not found: $EXCLUDE_PATTERNS"
+    fi
 
     # Exclude bundled skills
-    if [[ -f "$BUNDLED_SKILLS" ]]; then
+    if [[ -f "$EXCLUDE_SKILLS" ]]; then
         while IFS= read -r skill; do
             # Skip comments and empty lines
             [[ "$skill" =~ ^#.*$ ]] && continue
@@ -106,7 +81,7 @@ EOF
                 rel="${dir#$HERMES_HOME/}"
                 echo "${rel}/" >> "$exclude_file"
             done
-        done < "$BUNDLED_SKILLS"
+        done < "$EXCLUDE_SKILLS"
     fi
 
     echo "$exclude_file"

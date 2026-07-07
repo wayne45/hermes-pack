@@ -7,12 +7,14 @@ Backup and restore your [Hermes Agent](https://hermes-agent.nousresearch.com) en
 - **Bash CLI** — `hermes-pack.sh` for terminal use
 - **MCP Server** — Python MCP server for Claude Desktop, Cursor, and other MCP clients
 - **Tagged backups** — version your environment with meaningful names
-- **Smart exclusions** — skips bundled skills, caches, secrets, and large DBs
+- **Smart exclusions** — skips bundled skills, caches, secrets, and large DBs (configurable via `exclude-patterns.txt` and `exclude-skills.txt`)
 - **Cross-machine restore** — pull your setup onto a new machine in one command
 
 ## Install
 
 ### One-liner
+
+Installs to `~/hermes-pack` by default.
 
 ```bash
 bash <(curl -sL https://raw.githubusercontent.com/wayne45/hermes-pack/main/install.sh)
@@ -58,7 +60,8 @@ See [mcp/README.md](mcp/README.md) for configuration details.
 hermes-pack/
 ├── hermes-pack.sh        # Bash CLI (source of truth for logic)
 ├── install.sh            # One-liner installer
-├── bundled-skills.txt    # Skills excluded from backup (ship with Hermes)
+├── exclude-patterns.txt  # File/dir patterns excluded from backup
+├── exclude-skills.txt    # Skills excluded from backup (ship with Hermes)
 ├── README.md
 └── mcp/
     ├── pyproject.toml    # Python project (uses uv)
@@ -71,11 +74,9 @@ hermes-pack/
 1. **Push**: rsync `~/.hermes/` → local git working tree → commit → push to your private repo
 2. **Pull**: clone/fetch from private repo → rsync back to `~/.hermes/` → manual secret setup
 
-Excluded from backup:
-- Bundled skills (reinstalled by `hermes update`)
-- Caches, logs, sessions, sandboxes
-- Secrets (`.env`, `auth.json`)
-- `state.db` (large, not portable)
+Excluded from backup (edit these files to customize):
+- **`exclude-patterns.txt`** — file/directory patterns (caches, logs, secrets, temp files)
+- **`exclude-skills.txt`** — bundled skills reinstalled by `hermes update`
 
 ## Requirements
 
