@@ -1,0 +1,15 @@
+# Python
+mcp/.venv/
+mcp/__pycache__/
+mcp/*.egg-info/
+*.pyc
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# uv
+mcp/uv.lock

@@ -1,0 +1,7 @@
+# Bundled skills — excluded from hermes-pack push
+# These ship with Hermes and are reinstalled by `hermes update`
+# One skill name per line. Comments start with #.
+
+# Core bundled skills
+hermes-agent
+plan
