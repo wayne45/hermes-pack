@@ -59,6 +59,8 @@ ollama_cloud_models_cache.json
 # Session state (large and not portable)
 state.db
 state.db.gz
+state.db.malformed-backup-*
+state-snapshots/
 
 # Verification evidence (transient, self-regenerating)
 verification_evidence.db
