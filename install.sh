@@ -21,6 +21,8 @@ mkdir -p "$INSTALL_DIR"
 cp -f "$TMPDIR_DL/hermes-pack-main/hermes-pack.sh" "$INSTALL_DIR/"
 cp -f "$TMPDIR_DL/hermes-pack-main/README.md" "$INSTALL_DIR/"
 cp -f "$TMPDIR_DL/hermes-pack-main/install.sh" "$INSTALL_DIR/"
+cp -f "$TMPDIR_DL/hermes-pack-main/exclude-patterns.txt" "$INSTALL_DIR/"
+cp -f "$TMPDIR_DL/hermes-pack-main/exclude-skills.txt" "$INSTALL_DIR/"
 
 # Copy mcp directory
 if [[ -d "$TMPDIR_DL/hermes-pack-main/mcp" ]]; then
