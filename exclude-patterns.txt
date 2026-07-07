@@ -10,6 +10,9 @@ bin/
 cache/
 audio_cache/
 image_cache/
+provider_models_cache.json
+models_dev_cache.json
+ollama_cloud_models_cache.json
 
 # Logs and sessions
 logs/
@@ -21,12 +24,36 @@ pastes/
 *.db-shm
 *.db-wal
 
+# Runtime SQLite databases
+state.db
+state.db.gz
+state.db.malformed-backup-*
+state-snapshots/
+verification_evidence.db
+kanban.db
+kanban/boards/*/kanban.db
+
+# Runtime PID/state files
+gateway.pid
+gateway_state.json
+processes.json
+checkpoints/
+
 # Lock and backup files
 *.lock
 *.bak.*
 
+# IDE and editor settings (machine-specific)
+.idea/
+
+# UI state flags
+.scratch_tip_shown
+
 # Python cache
 __pycache__/
+
+# npm dependencies (regenerate from package-lock.json)
+node_modules/
 
 # OS files
 .DS_Store
@@ -43,24 +70,15 @@ auth.json
 # History
 .hermes_history
 
-# Skills hub cache
+# Skills
 skills/.hub/
 skills/.usage.json
 skills/.curator_state
 skills/.bundled_manifest
+skills/.curator_backups/
 
 # Misc temp/cache files
 interrupt_debug.log
-models_dev_cache.json
-ollama_cloud_models_cache.json
 .skills_prompt_snapshot.json
 .update_check
-
-# Session state (large and not portable)
-state.db
-state.db.gz
-state.db.malformed-backup-*
-state-snapshots/
-
-# Verification evidence (transient, self-regenerating)
-verification_evidence.db
+pairing/_rate_limits.json
