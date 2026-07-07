@@ -60,7 +60,7 @@ build_exclude_list() {
 
     # Load patterns from external file
     if [[ -f "$EXCLUDE_PATTERNS" ]]; then
-        while IFS= read -r line; do
+        while IFS= read -r line || [[ -n "$line" ]]; do
             [[ "$line" =~ ^#.*$ ]] && continue
             [[ -z "$line" ]] && continue
             echo "$line" >> "$exclude_file"
@@ -71,7 +71,7 @@ build_exclude_list() {
 
     # Exclude bundled skills
     if [[ -f "$EXCLUDE_SKILLS" ]]; then
-        while IFS= read -r skill; do
+        while IFS= read -r skill || [[ -n "$skill" ]]; do
             # Skip comments and empty lines
             [[ "$skill" =~ ^#.*$ ]] && continue
             [[ -z "$skill" ]] && continue
