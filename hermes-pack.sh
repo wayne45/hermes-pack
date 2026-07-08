@@ -3,8 +3,8 @@ set -euo pipefail
 
 # hermes-pack: Pack and restore Hermes agent environment to/from a private git repo.
 # Usage:
-#   hermes-pack push [--message "msg"] [--tag <name>]
-#   hermes-pack pull <repo-url> [--version <tag/hash>]
+#   hermes-pack push [--message "msg"] [--tag <name>] [--branch <name>]
+#   hermes-pack pull <repo-url> [--version <branch/tag/hash>]
 
 HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
 HERMES_PACK_HOME="$(cd "$(dirname "$0")" && pwd)"
@@ -502,7 +502,7 @@ usage() {
     echo ""
     echo "Usage:"
     echo "  hermes-pack push [--message \"msg\"] [--tag <name>] [--branch <name>]"
-    echo "  hermes-pack pull <repo-url> [--version <tag/hash>]"
+    echo "  hermes-pack pull <repo-url> [--version <branch/tag/hash>]"
     echo "  hermes-pack delete-tag <name>"
     echo "  hermes-pack update"
     echo "  hermes-pack clean"

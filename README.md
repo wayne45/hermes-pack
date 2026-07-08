@@ -29,14 +29,24 @@ chmod +x ~/hermes-pack/hermes-pack.sh
 
 ## CLI Usage
 
+Usage:
+```bash
+hermes-pack push [--message <msg>] [--tag <name>] [--branch <name>]
+    
+hermes-pack pull <repo-url> [--version <branch/tag/hash>]
+    
+hermes-pack delete-tag <name>
+    
+hermes-pack update
+    
+hermes-pack clean
+```
+
+Examples:
 ```bash
 # Backup
-~/hermes-pack/hermes-pack.sh push
+~/hermes-pack/hermes-pack.sh push --message "initial backup"
 ~/hermes-pack/hermes-pack.sh push --tag "before-upgrade" --message "full backup"
-
-# Restore — --version accepts a tag or commit hash
-# Note: pull only adds/overwrites files from the backup, it won't delete extra local skills or files
-~/hermes-pack/hermes-pack.sh pull <repo-url> [--version <tag/hash>]
 
 # First time or new machine (provide repo URL)
 ~/hermes-pack/hermes-pack.sh pull git@github.com:user/hermes-backup.git
